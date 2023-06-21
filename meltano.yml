@@ -1,0 +1,30 @@
+version: 1
+send_anonymous_usage_stats: true
+project_id: "tap-avantlink"
+default_environment: test
+environments:
+- name: test
+plugins:
+  extractors:
+  - name: "tap-avantlink"
+    namespace: "tap_avantlink"
+    pip_url: -e .
+    capabilities:
+    - state
+    - catalog
+    - discover
+    - about
+    - stream-maps
+    config:
+      start_date: 2023-01-01
+    settings:
+    # TODO: To configure using Meltano, declare settings and their types here:
+    - name: start_date
+    - name: end_date
+    - name: auth_token
+      kind: password
+    - name: publisher_id
+  loaders:
+  - name: target-jsonl
+    variant: andyh1203
+    pip_url: target-jsonl
