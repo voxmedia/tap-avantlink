@@ -147,7 +147,7 @@ class TapAvantlinkStream(RESTStream):
         next_page_date = datetime.strftime(next_page_token, date_format_str)
         if next_page_date:
             params["date_begin"] = next_page_date
-            end_datetime = datetime.strptime(next_page_date, date_format_str) + timedelta(days=27)
+            end_datetime = datetime.strptime(next_page_date, date_format_str) + timedelta(days=28)
             params["date_end"] = datetime.strftime(end_datetime, date_format_str)
         if self.replication_key:
             params["sort"] = "asc"
