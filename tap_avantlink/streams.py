@@ -146,7 +146,7 @@ class SalesStream(TapAvantlinkStream):
             'Total_Commission', 'Incentive_Commission', 'Base_Commission', 'Transaction_Amount'
         ]:
             try:
-                sanitized_row[float_col] = sanitized_row[float_col].replace('$', '')
+                sanitized_row[float_col] = sanitized_row[float_col].replace('$', '').replace('(', '-').replace(')', '')
                 sanitized_row[float_col] = set_none_or_cast(sanitized_row[float_col], float)
             except ValueError as e:
                 print(e)
@@ -224,8 +224,10 @@ class SalesHitsStream(TapAvantlinkStream):
         """
         sanitized_row = super().post_process(row, context)
         sanitized_row['Date'] = datetime.strftime(datetime.strptime(sanitized_row['Date'], '%m/%d/%Y %H:%M'), '%Y-%m-%d %H:%M:%S')
+        if 'Transaction_Amount' in sanitized_row:
+            sanitized_row['Transaction_Amount'] = sanitized_row['Transaction_Amount'].replace('$', '').replace('(', '-').replace(')', '')
         try:
-            sanitized_row['Transaction_Amount'] = float(sanitized_row['Transaction_Amount'].replace('$', ''))
+            sanitized_row['Transaction_Amount'] = float(sanitized_row['Transaction_Amount'])
         except ValueError as e:
             print(e)
         return sanitized_row
