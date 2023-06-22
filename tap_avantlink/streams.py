@@ -10,6 +10,15 @@ from singer_sdk import typing as th  # JSON Schema typing helpers
 from tap_avantlink.client import TapAvantlinkStream
 
 
+def set_none_or_cast(value, expected_type):
+    if value == "" or value is None:
+        return None
+    elif not isinstance(value, expected_type):
+        return expected_type(value)
+    else:
+        return value
+    
+
 class SalesStream(TapAvantlinkStream):
     """Define custom stream."""
 
@@ -130,16 +139,17 @@ class SalesStream(TapAvantlinkStream):
             'Merchant_Id', 'Item_Count', 'Website_Id'
         ]:
             try:
-                sanitized_row[int_col] = int(sanitized_row[int_col])
-            except ValueError:
-                sanitized_row[int_col] = 0
+                sanitized_row[int_col] = set_none_or_cast(sanitized_row[int_col], int)
+            except ValueError as e:
+                print(e)
         for float_col in [
             'Total_Commission', 'Incentive_Commission', 'Base_Commission', 'Transaction_Amount'
         ]:
             try:
-                sanitized_row[float_col] = float(sanitized_row[float_col].replace('$', ''))
-            except ValueError:
-                sanitized_row[float_col] = 0.0
+                sanitized_row[float_col] = sanitized_row[float_col].replace('$', '')
+                sanitized_row[float_col] = set_none_or_cast(sanitized_row[float_col], float)
+            except ValueError as e:
+                print(e)
         return sanitized_row
 
 class SalesHitsStream(TapAvantlinkStream):
@@ -216,6 +226,6 @@ class SalesHitsStream(TapAvantlinkStream):
         sanitized_row['Date'] = datetime.strftime(datetime.strptime(sanitized_row['Date'], '%m/%d/%Y %H:%M'), '%Y-%m-%d %H:%M:%S')
         try:
             sanitized_row['Transaction_Amount'] = float(sanitized_row['Transaction_Amount'].replace('$', ''))
-        except ValueError:
-            sanitized_row['Transaction_Amount'] = 0.0
+        except ValueError as e:
+            print(e)
         return sanitized_row
