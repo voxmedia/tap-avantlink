@@ -74,6 +74,9 @@ class DayChunkPaginator(BaseAPIPaginator):
             Boolean flag used to indicate if the endpoint has more pages.
         """
         return self.current_value < self.end_date
+    
+    def continue_if_empty(self, response: Response) -> bool:
+        return True
 
 
 class TapAvantlinkStream(RESTStream):
